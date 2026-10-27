@@ -10,7 +10,7 @@ A full-stack web application for a UK energy utility to monitor national wind ge
 
 ## 🚀 Live Application
 
-- **Deployed App**: *(Heroku/Vercel link — see deployment section)*
+- **Deployed App**: https://wetgesg.vercel.app/
 - **Data Source**: [Elexon BMRS](https://data.elexon.co.uk)
 
 ---
@@ -61,23 +61,27 @@ GridBricks Assignment/
 ## ✨ Features
 
 ### 1. Dashboard
+
 - Real-time KPI cards: **MAE, RMSE, MAPE, Forecast Bias**
 - Day-ahead wind forecast area chart for January 2026
 - Key insights panel (correlation, skill score, gate closure info)
 - Quick navigation to all sections
 
 ### 2. Forecasts Explorer
+
 - Full January 2026 day-ahead forecast profile (scrollable)
 - **Forecast version comparison**: see how predictions evolved for any delivery date
 - Gate closure logic explanation with date picker navigation
 
 ### 3. Actuals Viewer
+
 - 30-minute resolution wind actuals (FUELHH dataset)
 - Daily average & peak bar chart
 - Summary stats: total energy, peak, average, data point count
 - Tabular view of recent records
 
 ### 4. Accuracy Analysis
+
 - **MAE, RMSE, MAPE, Bias** with contextual interpretation
 - **Pearson correlation coefficient** between forecast and actual
 - **Skill Score vs. persistence** baseline
@@ -105,6 +109,7 @@ docker-compose up --build
 ### Option 2: Local Development
 
 **Backend:**
+
 ```bash
 cd backend
 pip install -r requirements.txt
@@ -112,6 +117,7 @@ uvicorn main:app --reload --port 8000
 ```
 
 **Frontend:**
+
 ```bash
 cd frontend
 npm install
@@ -146,6 +152,7 @@ npm run dev
 ```
 
 **Key Design Decisions:**
+
 - **TTL Caching**: Actuals cached 5 min, forecasts 15 min — avoids hammering Elexon API
 - **Day-ahead gate closure**: For each delivery hour in Jan 2026, we select the most recent forecast published before 23:00 UTC on the prior day
 - **Hourly matching**: FUELHH actuals (30-min) are averaged to hourly to align with WINDFOR (1-hr) before computing metrics
@@ -155,13 +162,15 @@ npm run dev
 
 ## 📊 Data Sources
 
-| Dataset | Endpoint | Resolution | Period |
-|---------|----------|------------|--------|
-| FUELHH  | `/datasets/FUELHH/stream?fuelType=WIND` | 30-minute | Jan 2026 actuals |
-| WINDFOR | `/datasets/WINDFOR/stream` | 1-hour | Dec 31 2025 – Jan 31 2026 forecasts |
+| Dataset | Endpoint                                | Resolution | Period                              |
+| ------- | --------------------------------------- | ---------- | ----------------------------------- |
+| FUELHH  | `/datasets/FUELHH/stream?fuelType=WIND` | 30-minute  | Jan 2026 actuals                    |
+| WINDFOR | `/datasets/WINDFOR/stream`              | 1-hour     | Dec 31 2025 – Jan 31 2026 forecasts |
 
 ### Key Finding
+
 The WINDFOR dataset shows a **systematic positive bias of ~1,714 MW** over January 2026. This likely reflects:
+
 - WINDFOR forecasts are based on installed capacity (potential generation)
 - FUELHH WIND records metered/settled MW including any curtailment or non-delivery
 - This gap is a real operational insight: procurement teams should apply a **bias correction of ~1.7 GW** when using WINDFOR forecasts
@@ -170,20 +179,21 @@ The WINDFOR dataset shows a **systematic positive bias of ~1,714 MW** over Janua
 
 ## 🛠️ Technology Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Frontend | React 18, Vite, Recharts, Axios, Lucide React |
-| Backend | Python 3.12, FastAPI, Uvicorn, pandas, numpy, httpx |
-| Caching | cachetools TTLCache |
-| Containerisation | Docker, Docker Compose |
-| Nginx | Reverse proxy + SPA serving |
-| Data | Elexon BMRS REST API |
+| Layer            | Technology                                          |
+| ---------------- | --------------------------------------------------- |
+| Frontend         | React 18, Vite, Recharts, Axios, Lucide React       |
+| Backend          | Python 3.12, FastAPI, Uvicorn, pandas, numpy, httpx |
+| Caching          | cachetools TTLCache                                 |
+| Containerisation | Docker, Docker Compose                              |
+| Nginx            | Reverse proxy + SPA serving                         |
+| Data             | Elexon BMRS REST API                                |
 
 ---
 
 ## 🤖 AI Tools Used
 
 This project was developed with assistance from **Google Antigravity (Gemini AI coding assistant)**:
+
 - Scaffolding of project structure
 - Backend API client and analytics engine code generation
 - Frontend React component development
@@ -196,16 +206,16 @@ All generated code was reviewed, validated against the Elexon API, and tested en
 
 ## 📋 API Reference
 
-| Endpoint | Description |
-|----------|-------------|
-| `GET /api/health` | Health check |
-| `GET /api/actuals/january2026` | All wind actuals for Jan 2026 |
-| `GET /api/actuals/range?from_dt=&to_dt=` | Custom date range actuals |
-| `GET /api/forecasts/january2026` | All WINDFOR forecasts for Jan 2026 |
-| `GET /api/forecasts/day-ahead` | Gate-closure-selected day-ahead forecasts |
-| `GET /api/forecasts/latest-snapshot` | Most recent forecast run |
-| `GET /api/forecasts/by-date?target_date=` | All forecast versions for a date |
-| `GET /api/analytics/accuracy` | Full metrics (MAE, RMSE, MAPE, bias, etc.) |
-| `GET /api/analytics/summary` | Summary metrics |
+| Endpoint                                  | Description                                |
+| ----------------------------------------- | ------------------------------------------ |
+| `GET /api/health`                         | Health check                               |
+| `GET /api/actuals/january2026`            | All wind actuals for Jan 2026              |
+| `GET /api/actuals/range?from_dt=&to_dt=`  | Custom date range actuals                  |
+| `GET /api/forecasts/january2026`          | All WINDFOR forecasts for Jan 2026         |
+| `GET /api/forecasts/day-ahead`            | Gate-closure-selected day-ahead forecasts  |
+| `GET /api/forecasts/latest-snapshot`      | Most recent forecast run                   |
+| `GET /api/forecasts/by-date?target_date=` | All forecast versions for a date           |
+| `GET /api/analytics/accuracy`             | Full metrics (MAE, RMSE, MAPE, bias, etc.) |
+| `GET /api/analytics/summary`              | Summary metrics                            |
 
 Full interactive docs: `/docs` (Swagger UI)
