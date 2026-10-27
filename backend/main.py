@@ -26,6 +26,12 @@ app.include_router(forecasts.router, prefix="/api/forecasts", tags=["Forecasts"]
 app.include_router(analytics.router, prefix="/api/analytics", tags=["Analytics"])
 
 
+@app.get("/")
+async def root():
+    return {"status": "ok", "message": "WindWatch UK API"}
+
+
 @app.get("/api/health")
+@app.get("/health")
 async def health_check():
     return {"status": "ok", "service": "WindWatch UK API"}
